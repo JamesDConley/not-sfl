@@ -1,0 +1,27 @@
+services:
+  nextjs-app:
+    build: .
+    ports:
+      - "3000:3000" # Only exposed during initial setup
+    networks:
+      - app-network
+
+  nginx-proxy:
+    build: ./nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certs-volume:/etc/letsencrypt
+    depends_on:
+      - nextjs-app
+    networks:
+      - app-network
+
+volumes:
+  certs-volume:
+    external: true
+
+networks:
+  app-network:
